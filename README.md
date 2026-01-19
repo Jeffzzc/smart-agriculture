@@ -12,7 +12,37 @@
 - `simulator/` Python LoRaWAN 终端/阀门模拟器
 - `frontend/` 可视化界面（Vue3 + ECharts）
 
-## 快速启动（单机）
+## 环境准备（Windows）
+
+### 1) 安装并确认 Node.js（建议 LTS）
+
+```bash
+node -v
+npm -v
+```
+
+### 2) 安装并确认 Python（建议 3.10+）
+
+```bash
+python --version
+pip --version
+```
+
+## 一键启动（Windows）
+
+在项目根目录运行：
+
+```bash
+.\start_system.bat
+```
+
+该脚本会分别启动：
+
+- 后端（HTTP:3000, MQTT:1883）
+- 模拟器（MQTT 上报/接收指令）
+- 前端（Vite:5173）
+
+## 手动启动（单机）
 
 ### 1) 启动后端（HTTP:3000, MQTT:1883）
 
@@ -57,4 +87,3 @@ npm run dev
 - 传感器上报：`farm/sensors/{sensorId}/uplink`
 - 阀门下发：`farm/valves/{valveId}/downlink`
 - 阀门回传：`farm/valves/{valveId}/status`
-
