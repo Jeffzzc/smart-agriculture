@@ -36,6 +36,8 @@ pip --version
 .\start_system.bat
 ```
 
+不要在项目根目录直接执行 `npm start`（根目录没有 `package.json`），后端/前端需要在各自子目录内执行。
+
 该脚本会分别启动：
 
 - 后端（HTTP:3000, MQTT:1883）

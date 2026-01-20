@@ -228,18 +228,37 @@ def main():
     args = parser.parse_args()
 
     sensors, valves = load_default_metas()
-    client = mqtt.Client(client_id=f"{args.client_prefix}-{random.randint(1000,9999)}", protocol=mqtt.MQTTv311)
+
+    client = mqtt.Client(
+        client_id=f"{args.client_prefix}-{random.randint(1000,9999)}",
+        protocol=mqtt.MQTTv311,
+        callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
+    )
     client.reconnect_delay_set(min_delay=1, max_delay=30)
-    def _on_disconnect(c, u, rc):
+
+    def _reconnect_forever(c):
         while True:
             try:
-                time.sleep(1)
                 c.reconnect()
                 return
             except Exception:
                 time.sleep(2)
+
+    def _on_disconnect(c, u, disconnect_flags, reason_code, properties):
+        t = threading.Thread(target=_reconnect_forever, args=(c,), daemon=True)
+        t.start()
+
     client.on_disconnect = _on_disconnect
-    client.connect(args.mqtt_host, args.mqtt_port, keepalive=60)
+
+    def _connect_with_retry():
+        while True:
+            try:
+                client.connect(args.mqtt_host, args.mqtt_port, keepalive=60)
+                return
+            except Exception:
+                time.sleep(1)
+
+    _connect_with_retry()
     client.loop_start()
 
     sensor_sim = SensorFleetSimulator(client, sensors, acreage=500)
